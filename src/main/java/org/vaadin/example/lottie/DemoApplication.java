@@ -3,11 +3,10 @@ package org.vaadin.example.lottie;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.server.ServiceInitEvent;
-import com.vaadin.flow.server.VaadinServiceInitListener;
 import org.jsoup.nodes.Element;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.stereotype.Component;
+import org.springframework.context.event.EventListener;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -20,23 +19,18 @@ public class DemoApplication implements AppShellConfigurator {
 		SpringApplication.run(DemoApplication.class, args);
 	}
 
-
-	@Component
-	public static class ApplicationServiceInitListener
-			implements VaadinServiceInitListener {
-
-		@Override
-		public void serviceInit(ServiceInitEvent event) {
-			event.addIndexHtmlRequestListener(response -> {
-				Element head = response.getDocument().head();
-				injectSeoAndSocialTags(head,
-						"Vaadin Lottie Demo application",
-						"Embed Lottie animations into your Vaadin Java application easily.",
-						"https://lottie-vaadin-demo.fly.dev/",
-						"https://lottie-vaadin-demo.fly.dev/lottie_social_preview.png",
-						LocalDate.now());
-			});
-		}
+	@EventListener
+	public void  configureSeoAndSocialTags(ServiceInitEvent event) {
+		// Inject SEO and social tags to head html element when the index.html is requested
+		event.addIndexHtmlRequestListener(response -> {
+			Element head = response.getDocument().head();
+			injectSeoAndSocialTags(head,
+					"Vaadin Lottie Demo application",
+					"Embed Lottie animations into your Vaadin Java application easily.",
+					"https://lottie-vaadin-demo.fly.dev/",
+					"https://lottie-vaadin-demo.fly.dev/lottie_social_preview.png",
+					LocalDate.now());
+		});
 	}
 
 	/**
